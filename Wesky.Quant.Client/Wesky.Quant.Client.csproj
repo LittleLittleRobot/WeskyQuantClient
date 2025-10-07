@@ -12,4 +12,10 @@
     <ProjectReference Include="..\Wesky.Quant.Client.ExtensionLibrary\Wesky.Quant.Client.ExtensionLibrary.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="weskyquant.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

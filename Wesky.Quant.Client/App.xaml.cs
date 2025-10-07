@@ -1,4 +1,5 @@
-﻿using Prism.Ioc;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Prism.Ioc;
 using Prism.Services.Dialogs;
 using Prism.Unity;
 using Serilog;
@@ -7,6 +8,9 @@ using System.Data;
 using System.Text;
 using System.Windows;
 using System.Windows.Threading;
+using Wesky.Quant.Client.Domain.Statics;
+using Wesky.Quant.Client.Infrastructure.Tools;
+using Wesky.Quant.Client.QuantExtensionServices;
 using Wesky.Quant.Client.ViewModels;
 using Wesky.Quant.Client.Views;
 
@@ -130,7 +134,7 @@ namespace Wesky.Quant.Client
         protected override void InitializeShell(Window shell)
         {
 
-            instance = new Mutex(true, "QClient", out bool createdNew); // 防止同一台电脑上多开
+            instance = new Mutex(true, "WeskyQuantClient", out bool createdNew); // 防止同一台电脑上多开
 
             if (createdNew)
             {
@@ -150,11 +154,20 @@ namespace Wesky.Quant.Client
         {
             /// 全局对象注册
             containerRegistry.Register<Dispatcher>(() => System.Windows.Application.Current.Dispatcher);
-
             //  注册弹出窗
             containerRegistry.RegisterDialogWindow<DialogWindow>();
-            // 注册编码
+
+            // 注册系统服务
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddSingleton(new ReadJsonHelper());
+            serviceCollection.AddSerilogConfiguration(); // 初始化日志配置信息（写入本地文件）
+            serviceCollection.AddHttpClient();
+            var provide = serviceCollection.BuildServiceProvider();
+            QuantServiceProviderStatic.QuantServiceProvider = provide;
+             // 注册编码
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+
         }
     }
 
